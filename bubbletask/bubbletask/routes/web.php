@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route untuk update status task done
     Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
 
-    // Profile routes
+    // Profile routes - Diperbaiki untuk konsistensi
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

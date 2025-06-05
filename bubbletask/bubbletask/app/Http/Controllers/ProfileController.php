@@ -9,12 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    /**
-     * Tampilkan halaman profil user.
-     */
     public function index(Request $request): View
     {
         return view('profile.index', [
@@ -22,9 +20,6 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Display the user's profile form.
-     */
     public function edit(Request $request): View
     {
         return view('profile.edit', [
@@ -32,38 +27,89 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update the user's profile information, termasuk upload foto.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+
+    public function update(Request $request): RedirectResponse
     {
         $user = $request->user();
+        $editType = $request->input('edit_type', 'full');
 
-        $user->fill($request->validated());
+        switch ($editType) {
+            case 'name':
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                ]);
+                
+                $user->update([
+                    'name' => $request->name,
+                ]);
+                
+                return redirect()->route('profile')->with('status', 'profile-updated');
 
-        if ($request->user()->isDirty('email')) {
-            $user->email_verified_at = null;
+            case 'password':
+                $request->validate([
+                    'current_password' => 'required',
+                    'password' => 'required|string|min:8|confirmed',
+                ]);
+
+                // Verify current password
+                if (!Hash::check($request->current_password, $user->password)) {
+                    return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+                }
+
+                $user->update([
+                    'password' => Hash::make($request->password),
+                ]);
+
+                return redirect()->route('profile')->with('status', 'password-updated');
+
+            case 'image':
+                $request->validate([
+                    'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+                ]);
+
+                // Delete old image if exists
+                if ($user->profile_picture) {
+                    Storage::disk('public')->delete($user->profile_picture);
+                }
+
+                // Upload new image
+                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                
+                $user->update([
+                    'profile_picture' => $path,
+                ]);
+
+                return redirect()->route('profile')->with('status', 'image-updated');
+
+            default:
+                // Full update (original functionality)
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+                    'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                ]);
+
+                $data = [
+                    'name' => $request->name,
+                    'email' => $request->email,
+                ];
+
+                if ($request->hasFile('profile_picture')) {
+                    // Delete old image if exists
+                    if ($user->profile_picture) {
+                        Storage::disk('public')->delete($user->profile_picture);
+                    }
+                    
+                    $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                    $data['profile_picture'] = $path;
+                }
+
+                $user->update($data);
+
+                return redirect()->route('profile')->with('status', 'profile-updated');
         }
-
-        // Handle upload foto profil
-        if ($request->hasFile('profile_picture')) {
-            if ($user->profile_picture) {
-                // Hapus file lama jika ada
-                Storage::disk('public')->delete($user->profile_picture);
-            }
-            // Simpan file baru di folder 'profile_pictures'
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $user->profile_picture = $path;
-        }
-
-        $user->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    /**
-     * Delete the user's account.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
