@@ -2,11 +2,28 @@
     <div class="flex items-center space-x-4">
         @auth
             {{-- Foto Profil --}}
-            <img src="{{ auth()->user()->profile_picture ? asset('storage/' . auth()->user()->profile_picture) : asset('default-profile.png') }}" 
-                 alt="Profile Picture" class="w-20 h-20 rounded-full object-cover">
+            <div class="relative">
+                <img src="{{ auth()->user()->profile_picture ?: asset('images/default-profile.png') }}" 
+                     alt="Profile Picture" 
+                     class="w-20 h-20 rounded-full object-cover border-2 border-gray-300"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                     onload="console.log('Avatar loaded successfully');">
+                
+                {{-- Fallback jika gambar tidak bisa dimuat --}}
+                <div class="w-20 h-20 rounded-full bg-gray-400 text-white flex items-center justify-content font-bold text-lg border-2 border-gray-300" 
+                     style="display: none;">
+                    {{ auth()->user()->initials ?? strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+            </div>
+            
             <div>
                 <h1 class="text-xl font-semibold text-gray-900">Good Morning, {{ auth()->user()->name ?? 'User' }}!</h1>
                 <p class="text-gray-600 text-sm">{{ auth()->user()->email ?? '' }}</p>
+                
+                <!-- {{-- Debug info (hapus setelah berhasil) --}}
+                <p class="text-xs text-blue-600 mt-1">
+                    Debug: {{ auth()->user()->profile_picture ? 'Has avatar URL' : 'No avatar URL' }}
+                </p> -->
             </div>
         @else
             {{-- Jika belum login --}}
@@ -24,3 +41,14 @@
         </form>
     @endauth
 </header>
+
+{{-- Script untuk debugging --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    @auth
+        console.log('Profile picture URL:', '{{ auth()->user()->profile_picture }}');
+        console.log('User name:', '{{ auth()->user()->name }}');
+        console.log('User initials:', '{{ auth()->user()->initials ?? "N/A" }}');
+    @endauth
+});
+</script>

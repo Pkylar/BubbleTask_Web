@@ -39,6 +39,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'profile_picture' => $this->getDefaultProfilePicture($request->name),
         ]);
 
         event(new Registered($user));
@@ -46,5 +47,49 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         return redirect(route('dashboard', absolute: false));
+    }
+
+    private function getDefaultProfilePicture($name){
+        return $this->generateInitialsAvatar($name);
+    }
+
+    private function generateInitialsAvatar($name){
+        $initials = $this->getInitials($name);
+        $background = $this->generateColorFromName($name);
+        
+        // Menggunakan UI Avatars service
+        return "https://ui-avatars.com/api/?name={$initials}&background={$background}&color=fff&size=200&bold=true";
+    }
+
+    private function getInitials($name){
+        $words = explode(' ', trim($name));
+        $initials = '';
+        
+        foreach ($words as $word) {
+            if (!empty($word)) {
+                $initials .= strtoupper(substr($word, 0, 1));
+            }
+        }
+        
+        return substr($initials, 0, 2); // Max 2 huruf
+    }
+
+    private function generateColorFromName($name){
+        $colors = [
+            '3D3F91',
+            //3498db', // Blue
+            /* 'e74c3c', // Red
+            '2ecc71', // Green
+            'f39c12', // Orange
+            '9b59b6', // Purple
+            '1abc9c', // Turquoise
+            'e67e22', // Carrot
+            '34495e', // Wet Asphalt
+            '16a085', // Green Sea
+            'c0392b', // Pomegranate */
+        ];
+        
+        $index = abs(crc32($name)) % count($colors);
+        return $colors[$index];
     }
 }
