@@ -16,11 +16,11 @@
             background: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+
         .manual-calendar {
             font-family: Arial, sans-serif;
         }
-        
+
         .calendar-header {
             display: flex;
             justify-content: space-between;
@@ -30,21 +30,21 @@
             background: #f8f9fa;
             border-radius: 4px;
         }
-        
+
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 1px;
             border: 1px solid #ddd;
         }
-        
+
         .calendar-cell {
             min-height: 80px;
             padding: 8px;
             border: 1px solid #eee;
             background: white;
         }
-        
+
         .calendar-cell.header {
             background: #f8f9fa;
             font-weight: bold;
@@ -54,12 +54,12 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .day-number {
             font-weight: bold;
             margin-bottom: 4px;
         }
-        
+
         .event-item {
             background: #007bff;
             color: white;
@@ -199,7 +199,14 @@ function createManualCalendar() {
             
             dayEvents.forEach(event => {
                 const eventTitle = event.title || 'Event';
-                html += `<div class="event-item" title="${eventTitle}" onclick="showEventDetails('${eventTitle}')">${eventTitle}</div>`;
+                const eventColor = event.color || '#007bff'; // Set warna berdasarkan prioritas
+                
+                // Sesuaikan warna untuk priority 'high' dan 'low'
+                if (event.color === '#f87171') {
+                    html += `<div class="event-item" style="background-color: #f87171;" title="${eventTitle}" onclick="showEventDetails('${eventTitle}')">${eventTitle}</div>`;
+                } else {
+                    html += `<div class="event-item" style="background-color: #60a5fa;" title="${eventTitle}" onclick="showEventDetails('${eventTitle}')">${eventTitle}</div>`;
+                }
             });
             
             html += `</div>`;
@@ -245,7 +252,11 @@ function initializeFullCalendar() {
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek'
             },
-            events: events,
+            events: events.map(event => ({
+                ...event,
+                // Mengatur background color berdasarkan prioritas
+                backgroundColor: event.priority === 'high' ? '#f87171' : '#60a5fa',  // Merah untuk high, hijau untuk low
+            })),
             eventClick: function(info) {
                 if(info.event.url) {
                     info.jsEvent.preventDefault();
@@ -262,12 +273,6 @@ function initializeFullCalendar() {
         updateStatus('❌ Error initializing FullCalendar, using fallback', true);
         createManualCalendar();
     }
-}
-
-// Fungsi untuk navigasi manual calendar
-function changeMonth(direction) {
-    // Implementasi sederhana - reload halaman dengan parameter bulan
-    console.log('Change month:', direction);
 }
 
 // Main initialization
