@@ -28,7 +28,7 @@ class ProfileController extends Controller
     }
 
 
-    public function update(Request $request): RedirectResponse
+    /* public function update(Request $request): RedirectResponse
     {
         $user = $request->user();
         $editType = $request->input('edit_type', 'full');
@@ -102,6 +102,82 @@ class ProfileController extends Controller
                     
                     $path = $request->file('profile_picture')->store('profile_pictures', 'public');
                     $data['profile_picture'] = $path;
+                }
+
+                $user->update($data);
+
+                return redirect()->route('profile')->with('status', 'profile-updated');
+        }
+    } */
+
+    public function update(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $editType = $request->input('edit_type', 'full');
+
+        switch ($editType) {
+            case 'name':
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                ]);
+                
+                $user->update([
+                    'name' => $request->name,
+                ]);
+                
+                return redirect()->route('profile')->with('status', 'profile-updated');
+
+            case 'password':
+                $request->validate([
+                    'current_password' => 'required',
+                    'password' => 'required|string|min:8|confirmed',
+                ]);
+
+                if (!Hash::check($request->current_password, $user->password)) {
+                    return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+                }
+
+                $user->update([
+                    'password' => Hash::make($request->password),
+                ]);
+
+                return redirect()->route('profile')->with('status', 'password-updated');
+
+            case 'image':
+                $request->validate([
+                    'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+                ]);
+
+                // Convert image to base64
+                $image = $request->file('profile_picture');
+                $imageData = base64_encode(file_get_contents($image->getRealPath()));
+                $mimeType = $image->getMimeType();
+                $base64Image = 'data:' . $mimeType . ';base64,' . $imageData;
+
+                $user->update([
+                    'profile_picture' => $base64Image,
+                ]);
+
+                return redirect()->route('profile')->with('status', 'image-updated');
+
+            default:
+                // Full update
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+                    'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                ]);
+
+                $data = [
+                    'name' => $request->name,
+                    'email' => $request->email,
+                ];
+
+                if ($request->hasFile('profile_picture')) {
+                    $image = $request->file('profile_picture');
+                    $imageData = base64_encode(file_get_contents($image->getRealPath()));
+                    $mimeType = $image->getMimeType();
+                    $data['profile_picture'] = 'data:' . $mimeType . ';base64,' . $imageData;
                 }
 
                 $user->update($data);

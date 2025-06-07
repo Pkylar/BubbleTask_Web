@@ -29,9 +29,11 @@
         <div class="text-center mb-8">
             <div class="relative inline-block">
                 @if ($user->profile_picture)
-                    <img src="{{ asset('storage/' . $user->profile_picture) }}" 
-                         alt="Profile Picture" 
-                         class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-white shadow-lg">
+                    <img src="{{ auth()->user()->profile_picture ?: asset('images/default-profile.png') }}" 
+                     alt="Profile Picture" 
+                     class="w-20 h-20 rounded-full object-cover border-2 border-gray-300"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                     onload="console.log('Avatar loaded successfully');">
                 @else
                     <div class="w-32 h-32 rounded-full bg-gray-300 mx-auto border-4 border-white shadow-lg flex items-center justify-center">
                         <svg class="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 20 20">

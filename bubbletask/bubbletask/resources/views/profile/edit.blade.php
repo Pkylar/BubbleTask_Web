@@ -65,7 +65,37 @@
 
     @elseif($editType === 'image')
         <!-- Change Profile Picture Form -->
-        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+         <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="edit_type" value="image">
+
+        <div>
+            <label class="block font-semibold mb-1" for="profile_picture">Profile Picture</label>
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" 
+                class="w-full border border-gray-300 rounded px-3 py-2" required>
+            @error('profile_picture') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+
+            @if ($user->profile_picture)
+                <div class="mt-4">
+                    <p class="text-sm text-gray-600 mb-2">Current Profile Picture:</p>
+                    <img src="{{ $user->profile_picture }}" 
+                        alt="Profile Picture" 
+                        class="w-20 h-20 rounded-full object-cover border-2 border-gray-300"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        onload="console.log('Avatar loaded successfully');">
+                    
+                    <!-- Fallback jika gambar tidak load -->
+                    <div style="display:none;" class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span class="text-gray-600 text-xs">No Image</span>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Changes</button>
+    </form>
+        <!-- <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             @method('PATCH')
             <input type="hidden" name="edit_type" value="image">
@@ -79,15 +109,17 @@
                 @if ($user->profile_picture)
                     <div class="mt-4">
                         <p class="text-sm text-gray-600 mb-2">Current Profile Picture:</p>
-                        <img src="{{ asset('storage/' . $user->profile_picture) }}" 
-                             alt="Current Profile Picture" 
-                             class="w-24 h-24 rounded-full object-cover">
+                        <img src="{{ auth()->user()->profile_picture ?: asset('images/default-profile.png') }}" 
+                            alt="Profile Picture" 
+                            class="w-20 h-20 rounded-full object-cover border-2 border-gray-300"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            onload="console.log('Avatar loaded successfully');">
                     </div>
                 @endif
             </div>
 
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Changes</button>
-        </form>
+        </form> -->
 
     @else
         <!-- Default/Full Edit Form -->
