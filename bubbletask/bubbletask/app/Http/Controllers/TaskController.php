@@ -86,20 +86,19 @@ class TaskController extends Controller
         return redirect()->route('home')->with('success', 'Task berhasil dibuat!');
     }
 
-    // Method untuk tandai task selesai
     public function complete(Task $task)
     {
         if ($task->user_id !== auth()->id()) {
             abort(403);
         }
 
-        $task->status = 'done';
-        $task->save();
+        // Langsung delete task
+        $task->delete();
 
         if (request()->ajax()) {
-            return response()->json(['success' => true]);
+            return response()->json(['success' => true, 'message' => 'Task berhasil dihapus']);
         }
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Task berhasil dihapus');
     }
 }

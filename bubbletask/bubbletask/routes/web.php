@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
 
     // Route untuk update status task done
     Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
