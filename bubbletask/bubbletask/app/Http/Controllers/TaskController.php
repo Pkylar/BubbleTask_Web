@@ -7,6 +7,75 @@ use App\Models\Task;
 
 class TaskController extends Controller
 {
+    public function destroy(Task $task)
+    {
+        if ($task->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Hapus task
+        $task->delete();
+
+        return redirect()->route('priority')->with('success', 'Task berhasil dihapus!');
+    }
+
+    public function edit(Task $task)
+    {
+        // Pastikan task milik user yang sedang login
+        if ($task->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Tampilkan form edit dengan data task
+        return view('tasks.edit', compact('task'));
+    }
+
+    public function update(Request $request, Task $task)
+    {
+        // Validasi data yang diedit
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'due_date' => 'required|date',
+            'priority' => 'required|in:high,low',
+            'status' => 'required|in:pending,completed',  // Pastikan status valid
+        ]);
+
+        // Pastikan task milik user yang sedang login
+        if ($task->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Update data task, termasuk status jika ada perubahan
+        $task->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'due_date' => $validated['due_date'],
+            'priority' => $validated['priority'],
+            'status' => $validated['status'],  // Update status
+        ]);
+
+        // Redirect ke halaman priority dengan pesan sukses
+        return redirect()->route('priority')->with('success', 'Task berhasil diperbarui!');
+    }
+
+    public function complete(Task $task)
+    {
+        if ($task->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Ubah status task menjadi "completed"
+        $task->status = 'completed';  // Ganti "done" dengan "completed"
+        $task->save();
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->back();
+    }
+
     public function show(Task $task)
     {
         return view('tasks.show', compact('task'));
@@ -84,21 +153,5 @@ class TaskController extends Controller
         ]);
 
         return redirect()->route('home')->with('success', 'Task berhasil dibuat!');
-    }
-
-    public function complete(Task $task)
-    {
-        if ($task->user_id !== auth()->id()) {
-            abort(403);
-        }
-
-        // Langsung delete task
-        $task->delete();
-
-        if (request()->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Task berhasil dihapus']);
-        }
-
-        return redirect()->back()->with('success', 'Task berhasil dihapus');
     }
 }

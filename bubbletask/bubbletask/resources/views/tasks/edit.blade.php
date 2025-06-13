@@ -44,7 +44,7 @@
         <label for="status" class="block font-semibold mb-1">Status</label>
         <select id="status" name="status" class="w-full border border-gray-300 rounded px-3 py-2" required>
             <option value="pending" {{ old('status', $task->status) == 'pending' ? 'selected' : '' }}>Pending</option>
-            <option value="done" {{ old('status', $task->status) == 'done' ? 'selected' : '' }}>Done</option>
+            <option value="completed" {{ old('status', $task->status) == 'completed' ? 'selected' : '' }}>Completed</option>
         </select>
         @error('status') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
     </div>
