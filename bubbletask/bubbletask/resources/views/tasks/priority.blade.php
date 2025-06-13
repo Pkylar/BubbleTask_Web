@@ -38,14 +38,23 @@
                     </form>
                 </div>
 
-                {{-- Wrapper untuk High/Low priority --}}
-                <div class="flex-1">
+                {{-- Wrapper untuk konten utama task --}}
+                <div class="flex-1 ml-6">
                     <h3 class="font-semibold">{{ $task->title }}</h3>
                     <p>{{ $task->description }}</p>
                     <small>Due: {{ $task->due_date->format('d M Y, H:i') }}</small>
                 </div>
 
-                {{-- High/Low Priority yang diletakkan di bawah "x" --}}
+                {{-- Status Task --}}
+                <div class="mt-2">
+                    @if($task->status == 'completed')
+                        <span class="px-3 py-1 bg-green-600 text-white rounded">Completed</span>
+                    @else
+                        <span class="px-3 py-1 bg-yellow-500 text-white rounded">Pending</span>
+                    @endif
+                </div>
+
+                {{-- High/Low Priority --}}
                 <div class="mt-2">
                     @if($task->priority == 'high')
                         <span class="px-3 py-1 bg-red-500 text-white rounded">High</span>

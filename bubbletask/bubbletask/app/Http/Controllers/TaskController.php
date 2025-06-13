@@ -98,7 +98,11 @@ class TaskController extends Controller
                        ->orderByRaw("CASE WHEN priority = 'high' THEN 1 ELSE 2 END ASC")
                        ->get();
 
-        return view('tasks.index', compact('tasks'));
+        $completedTasks = Task::where('user_id', auth()->id())
+                         ->where('status', 'completed')
+                         ->orderBy('updated_at', 'desc')
+                         ->get();
+        return view('tasks.index', compact('tasks', 'completedTasks'));
     }
 
     public function calendar()
