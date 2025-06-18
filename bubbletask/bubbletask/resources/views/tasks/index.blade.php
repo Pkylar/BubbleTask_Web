@@ -13,11 +13,6 @@
             class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
     </form>
-
-    <a href="{{ route('tasks.create') }}"
-       class="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-5 py-2 rounded shadow transition-colors duration-300 whitespace-nowrap">
-       + Add New Task
-    </a>
 </div>
 
 <h2 class="text-2xl mb-4 font-semibold text-gray-800">Your Tasks</h2>
@@ -60,38 +55,29 @@
     @if($completedTasks->isEmpty())
         <p class="text-gray-500 italic">No completed tasks yet.</p>
     @else
-        
-            <ul>
-                @foreach($completedTasks as $task)
-                    <li class="mb-2 p-3 bg-white rounded shadow flex items-center justify-between opacity-75">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-bold mr-4">
-                                ✓
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-gray-600 line-through">{{ $task->title }}</h3>
-                                <p class="text-gray-500 text-sm">{{ $task->description }}</p>
-                                <small class="text-gray-400">Completed: {{ $task->updated_at->format('d M Y, H:i') }}</small>
-                            </div>
+        <ul>
+            @foreach($completedTasks as $task)
+                <li class="mb-2 p-3 bg-white rounded shadow flex items-center justify-between opacity-75">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-bold mr-4">
+                            ✓
                         </div>
-                        <div class="flex items-center space-x-4">
-                            @if($task->priority == 'high')
-                                <span class="px-2 py-1 bg-red-300 text-red-700 rounded text-sm">High</span>
-                            @else
-                                <span class="px-2 py-1 bg-green-300 text-green-700 rounded text-sm">Low</span>
-                            @endif
-                            
-                            <!--  Tombol untuk menghapus permanen 
-                            <button onclick="confirmDeletePermanent({{ $task->id }}, '{{ addslashes($task->title) }}')" 
-                                    title="Delete Permanently"
-                                    class="w-6 h-6 rounded-full bg-red-400 hover:bg-red-500 flex items-center justify-center text-white text-sm">
-                                ×
-                            </button> -->
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-600 line-through">{{ $task->title }}</h3>
+                            <p class="text-gray-500 text-sm">{{ $task->description }}</p>
+                            <small class="text-gray-400">Completed: {{ $task->updated_at->format('d M Y, H:i') }}</small>
                         </div>
-                    </li>
-                @endforeach
-            </ul>
-        
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        @if($task->priority == 'high')
+                            <span class="px-2 py-1 bg-red-300 text-red-700 rounded text-sm">High</span>
+                        @else
+                            <span class="px-2 py-1 bg-green-300 text-green-700 rounded text-sm">Low</span>
+                        @endif
+                    </div>
+                </li>
+            @endforeach
+        </ul>
     @endif
 </div>
 
@@ -277,17 +263,6 @@
             successDiv.remove();
         }, 3000);
     }
-
-    /* function showErrorMessage(message) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        errorDiv.textContent = message;
-        document.body.appendChild(errorDiv);
-        
-        setTimeout(() => {
-            errorDiv.remove();
-        }, 5000);
-    } */
 
     // Close modals when clicking outside
     document.getElementById('confirmModal').addEventListener('click', function(e) {

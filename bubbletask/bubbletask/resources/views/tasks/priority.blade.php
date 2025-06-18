@@ -16,6 +16,8 @@
         @foreach($tasks as $task)
             @php
                 $taskDate = $task->due_date->format('l, d F Y'); // contoh: Monday, 03 June 2025
+                $isPastDue = $task->due_date < now(); // Mengecek apakah tugas sudah lewat tanggal
+                $isCompleted = $task->status == 'completed'; // Mengecek apakah tugas sudah selesai
             @endphp
 
             {{-- Tampilkan tanggal baru jika berbeda dari sebelumnya --}}
@@ -28,7 +30,9 @@
                 </li>
             @endif
 
-            <li class="mb-4 p-4 bg-white rounded shadow flex justify-between items-start space-x-4 relative">
+            <li class="mb-4 p-4 rounded shadow flex justify-between items-start space-x-4 relative 
+                {{ $isCompleted ? 'bg-green-200' : '' }}  {{-- Warna hijau muda untuk yang selesai --}}
+                {{ $isCompleted || $isPastDue ? 'opacity-60' : '' }}">
                 {{-- Tombol Hapus "x" kecil di kiri atas --}}
                 <div class="absolute top-2 left-2">
                     <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this task?')">

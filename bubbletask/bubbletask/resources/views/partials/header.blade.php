@@ -17,7 +17,7 @@
             </div>
             
             <div>
-                <h1 class="text-xl font-semibold text-gray-900">Good Morning, {{ auth()->user()->name ?? 'User' }}!</h1>
+                <h1 class="text-xl font-semibold text-gray-900" id="greeting"></h1>
                 <p class="text-gray-600 text-sm">{{ auth()->user()->email ?? '' }}</p>
                 
                 <!-- {{-- Debug info (hapus setelah berhasil) --}}
@@ -42,10 +42,25 @@
     @endauth
 </header>
 
-{{-- Script untuk debugging --}}
+{{-- Script untuk menyesuaikan sapaan berdasarkan waktu --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     @auth
+        const currentHour = new Date().getHours();  // Mengambil jam lokal pengguna
+        let greetingMessage;
+
+        // Menentukan sapaan berdasarkan waktu
+        if (currentHour >= 5 && currentHour < 12) {
+            greetingMessage = 'Good Morning';
+        } else if (currentHour >= 12 && currentHour < 18) {
+            greetingMessage = 'Good Afternoon';
+        } else if (currentHour >= 18 && currentHour < 21) {
+            greetingMessage = 'Good Evening';
+        } else {
+            greetingMessage = 'Good Night';
+        }
+
+        document.getElementById('greeting').textContent = `${greetingMessage}, {{ auth()->user()->name ?? 'User' }}!`;
         console.log('Profile picture URL:', '{{ auth()->user()->profile_picture }}');
         console.log('User name:', '{{ auth()->user()->name }}');
         console.log('User initials:', '{{ auth()->user()->initials ?? "N/A" }}');

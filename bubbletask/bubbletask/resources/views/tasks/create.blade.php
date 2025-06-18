@@ -69,7 +69,8 @@
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         time_24hr: true,
-        defaultDate: "{{ old('due_date') ?? '' }}"
+        defaultDate: "{{ old('due_date') ?? '' }}",
+        minDate: "today",  // Menetapkan batas minimum untuk memilih tanggal adalah hari ini
     });
 
     const btnHigh = document.getElementById('btnHigh');

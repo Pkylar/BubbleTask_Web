@@ -8,9 +8,22 @@
         <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-32 h-auto" />
     </div>
 
-    {{-- Tombol Add Task warna oranye di atas --}}
-    <a href="{{ route('tasks.create') }}" class="flex items-center space-x-3 px-4 py-2 rounded-md
-        {{ request()->routeIs('tasks.create') ? 'bg-orange-400 text-white' : 'text-orange-600 hover:bg-orange-300' }}">
+    {{-- Form Pencarian Tugas --}}
+    <div>
+        <form action="{{ route('home') }}" method="GET" class="flex items-center space-x-2 px-2 py-1 bg-white border rounded-md">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search tasks..."
+                value="{{ request('search') }}"
+                class="w-full border-none px-2 py-1"
+            />
+            <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded-md text-sm">Search</button>
+        </form>
+    </div>
+
+    {{-- Tombol Add Task dengan warna latar belakang dan border yang sama --}}
+    <a href="{{ route('tasks.create') }}" class="flex items-center space-x-3 px-4 py-2 rounded-md bg-orange-400 text-white border-2 border-orange-400">
         <!-- ikon plus -->
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
